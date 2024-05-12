@@ -9,6 +9,122 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "cockroachdb"
   url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(uuid()) @db.Uuid
+  userId            String  @map("user_id") @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("account")
+}
+
+model User {
+  id                  String                @id @default(uuid()) @db.Uuid
+  name                String
+  email               String?               @unique
+  emailVerified       DateTime?             @map("email_verified")
+  image               String?
+  qrcode              String?
+  accounts            Account[]
+  organizer           Event[]
+  eventParticipants   EventParticipants[]
+  billingParticipants BillingParticipants[]
+  itemParticipants    ItemParticipants[]
+
+  @@map("user")
+}
+
+model Event {
+  id                String              @id @default(uuid()) @db.Uuid
+  name              String
+  location          String?
+  date              DateTime
+  description       String?
+  notification      String
+  joinId            String?             @map("join_id")
+  organizer         User                @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  organizerId       String              @map("organizer_id") @db.Uuid
+  eventParticipants EventParticipants[]
+  billing           Billing?
+
+  @@map("event")
+}
+
+model EventParticipants {
+  eventId String @map("event_id") @db.Uuid
+  userId  String @map("user_id") @db.Uuid
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, userId])
+  @@map("event_participants")
+}
+
+model Billing {
+  id                  String                @id @default(uuid()) @db.Uuid
+  eventId             String                @unique @map("event_id") @db.Uuid
+  totalAmount         Float                 @map("total_amount")
+  serviceCharge       Float?                @default(0) @map("service_charge")
+  vat                 Float?                @default(0)
+  discount            Float?                @default(0)
+  billingParticipants BillingParticipants[]
+  items               Item[]
+  event               Event                 @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("billing")
+}
+
+model BillingParticipants {
+  billingId     String        @map("billing_id") @db.Uuid
+  userId        String        @map("user_id") @db.Uuid
+  totalAmount   Float         @map("total_amount")
+  paymentSlip   String?       @map("payment_slip")
+  paymentStatus PaymentStatus @default(unpaid) @map("payment_status")
+  billing       Billing       @relation(fields: [billingId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([billingId, userId])
+  @@map("billing_participants")
+}
+
+model Item {
+  id               String             @id @default(uuid()) @db.Uuid
+  billingId        String             @map("billing_id") @db.Uuid
+  name             String
+  price            Float
+  itemParticipants ItemParticipants[]
+  billing          Billing            @relation(fields: [billingId], references: [id], onDelete: Cascade)
+
+  @@map("item")
+}
+
+model ItemParticipants {
+  itemId String @map("item_id") @db.Uuid
+  userId String @map("user_id") @db.Uuid
+  price  Float
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([itemId, userId])
+  @@map("item_participants")
+}
+
+enum PaymentStatus {
+  unpaid
+  verifying
+  paid
 }

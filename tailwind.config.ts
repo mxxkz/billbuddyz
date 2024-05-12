@@ -73,6 +73,9 @@ const config = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
+    fontFamily: {
+      abc: ["IBM Plex Sans Thai", "sans-serif"]
+    }
   },
   plugins: [require("tailwindcss-animate")],
 } satisfies Config
