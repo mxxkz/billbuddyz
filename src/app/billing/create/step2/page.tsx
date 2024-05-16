@@ -28,10 +28,10 @@ import { IoAddCircleSharp } from 'react-icons/io5'
 import { FaCircleMinus } from 'react-icons/fa6'
 import ParticipantCheckboxes from '@/components/ParticipantCheckboxes'
 import { useBillingStore } from '@/stores/billingStore'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 
 
-export default function Step2() {
+function Step2() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const billingType = searchParams.get('billingType')
@@ -377,5 +377,12 @@ export default function Step2() {
         </>}
       </div>
     </div>
+  )
+}
+export default function Step2Wrapper() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Step2 />
+    </Suspense>
   )
 }
