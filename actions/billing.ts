@@ -261,7 +261,8 @@ export async function createBillingList(eventId: string,data: createBillingListS
     totalBillAmount += vat
     totalBillAmount += serviceCharge
     totalBillAmount -= discount
-    const isNotIncludeVat = Math.abs(totalBillAmount - totalAmount) <= 1
+    const isIncludeVat = Math.abs(totalBillAmount - totalAmount) <= 1
+    console.log(isIncludeVat)
 
     itemList.forEach(item => {
       const pricePerParticipant = item.price / item.participantList.length
@@ -287,7 +288,7 @@ export async function createBillingList(eventId: string,data: createBillingListS
       participantDiscount += totalExpense * (discountPercentage / 100)
 
       // Apply VAT and service charge if applicable
-      if (isNotIncludeVat) {
+      if (!isIncludeVat) {
         totalExpense += totalExpense * 0.07
         participantVat += totalExpense * 0.07
       }
