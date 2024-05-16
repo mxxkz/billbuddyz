@@ -243,12 +243,12 @@ export default function Page(){
                   <Skeleton className="h-[250px] w-full rounded-xl bg-white" />
                 ):(
                   <>
-              <div className='relative w-full h-full aspect-square shadow-lg rounded-2xl border'>
-                <Image src={event? event.organizer.qrcode: ''} alt='logo' fill />
+              <div className='relative w-full h-full aspect-square shadow-lg rounded-2xl border flex items-center justify-center'>
+                {event.organizer.qrcode?
+                  (<Image src={event.organizer.qrcode} alt='logo' fill />):(
+                    <div>ไม่มี QR Code</div>
+                  )}
               </div>
-                    <a href={event ? event.organizer.qrcode : ''} download target="_blank" rel="noopener noreferrer">
-                      <Button>Download Image</Button>
-                    </a>
               </>
               )
               }
