@@ -16,8 +16,10 @@ export const createBillingListSchema = z.object({
     name: z.string(),
     price: z.coerce.number(),
     participantList: z.array(z.object({
-        id: z.string(),
-    }))
+      id: z.string(),
+    })).refine(participants => participants.length > 0, {
+      message: 'แต่ละรายการต้องมีคนจ่ายอย่างน้อย 1 คน',
+    })
   }))
 })
 

@@ -6,7 +6,6 @@ export const createEventSchema =  z.object({
   description: z.string().optional(),
   date: z.any(),
   location: z.string().optional(),
-  notification: z.enum(['0','10', '30', '60', '1440',]),
   joinId: z.string().nullable(),
   organizerId: z.string()
 })
@@ -18,7 +17,6 @@ export const editEventSchema = z.object({
   description: z.string().optional(),
   date: z.any(),
   location: z.string().optional(),
-  notification: z.enum(['0','10', '30', '60', '1440',]),
   organizerId: z.string()
 })
 

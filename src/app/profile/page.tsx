@@ -8,16 +8,17 @@ import {
   AvatarFallback
 } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
-import {Switch} from '@/components/ui/switch'
 import { MdLogout } from 'react-icons/md'
 import Image from 'next/image'
 import { signOut, useSession } from 'next-auth/react'
-import { redirect, useRouter } from 'next/navigation'
+import { redirect } from 'next/navigation'
 import { QrCodeDialog } from '@/components/QrCodeDialog'
 import { toast } from '@/components/ui/use-toast'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
 import { getQrCode } from '../../../actions/user'
+import { HiOutlineLightBulb } from 'react-icons/hi'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
 export default function Profile() {
   const {data: session, status} = useSession()
@@ -34,7 +35,6 @@ export default function Profile() {
         const response = await getQrCode(session.user.id)
         if (response) {
           await setImage(response.qrcode)
-          console.log('image url', image)
         }
       };
       fetchImageUrl()
@@ -84,15 +84,14 @@ export default function Profile() {
                   </div>)
                 )
               }
+              <Alert>
+                <HiOutlineLightBulb size={20}/>
+                <AlertTitle>Tips!</AlertTitle>
+                <AlertDescription>
+                  เพิ่ม QR Code เพื่อความสะดวกในการเรียกเก็บเงิน
+                </AlertDescription>
+              </Alert>
             <Separator className='w-full'/>
-              <div className='flex flex-col gap-2'>
-                <div className='flex justify-between'>
-                  <span className='font-medium'>การแจ้งเตือน</span>
-                  <Switch />
-                </div>
-                <span className='text-[#94A3B8]'>เปิดการแจ้งเตือนเพื่อให้ไม่พลาดการแจ้งเตือนนัดหมายและการเรียกเก็บเงิน</span>
-              </div>
-              <Separator className='w-full'/>
               <div className='flex justify-between w-full items-center' onClick={()=>{signOut().catch(console.error)}}>
                 <span className='font-medium'>ออกจากระบบ</span>
                 <MdLogout size={30} color='#94A3B8'/>

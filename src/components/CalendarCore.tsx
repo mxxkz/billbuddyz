@@ -16,7 +16,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { FaCirclePlus } from 'react-icons/fa6'
 import Link from 'next/link'
-import { signOut } from 'next-auth/react'
 import { useEffect } from 'react'
 import { deleteEvent, getAllEvent } from '../../actions/event'
 import { Separator } from '@/components/ui/separator'
@@ -30,7 +29,6 @@ import { FaPen } from 'react-icons/fa6'
 import { FaLocationDot } from 'react-icons/fa6'
 import { CgDetailsMore } from 'react-icons/cg'
 import { BiSolidDoorOpen } from 'react-icons/bi'
-import { FaBell } from 'react-icons/fa'
 import { BsPeopleFill } from 'react-icons/bs'
 import { IoPerson } from 'react-icons/io5'
 import * as React from 'react'
@@ -59,22 +57,14 @@ export const CalendarCore = () => {
   const [data, setData] = useState<any>(null)
   const [events, setEvents] = useState<any[]>([])
   const router = useRouter()
-  const notificationMapping: {[key:string]: string} = {
-    '0': 'ไม่แจ้งเตือน',
-    '10': 'ก่อน 10 นาที',
-    '30': 'ก่อน 30 นาที',
-    '60': 'ก่อน 1 ชั่วโมง',
-    '1440': 'ก่อน 1 วัน',
-  }
   const {eventId, setEventId} = useParticipantsStore()
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await getAllEvent(); // replace with your fetch function
+      const response = await getAllEvent()
       if(response !== null) {
         setData(response)
         setEvents(response.eventParticipants)
-        console.log('this is response', response)
       }
     }
     fetchData()
@@ -106,7 +96,7 @@ export const CalendarCore = () => {
   }
 
   return (
-    <div className='flex gap-10 justify-center sm:w-1/2 items-center sm:flex-row flex-col'>
+    <div className='flex gap-10 justify-center sm:w-1/2 w-full items-center flex-col'>
     <Card className='bg-white p-4 w-full'>
       <div className='flex justify-between items-center'>
         <GrFormPrevious
@@ -231,7 +221,7 @@ export const CalendarCore = () => {
               </DrawerTrigger>
               <DrawerContent>
                 <div className='mx-auto w-full max-w-sm flex flex-col sm:p-4 sm:max-w-full gap-4 pb-10'>
-                  {event.event.organizer.id === data.id && (
+                  {event.event.organizer.id === data.id && !event.event.billing && (
                   <div className='self-end flex gap-4'>
                     <Dialog>
                       <DialogTrigger>
@@ -292,10 +282,6 @@ export const CalendarCore = () => {
                   </div>
                   }
                   <div className='flex gap-2'>
-                    <FaBell size={25} />
-                    {notificationMapping[event.event.notification]}
-                  </div>
-                  <div className='flex gap-2'>
                     <BsPeopleFill size={25} />
                     <div className='flex flex-col gap-2'>
                       <span>{event.event.eventParticipants.length} ผู้เข้าร่วม</span>
@@ -340,7 +326,7 @@ export const CalendarCore = () => {
         )
       })
     ) : (
-      <p className='text-gray-400'>No meetings for today.</p>
+      <p className='text-gray-400'>วันนี้ไม่มีกิจกรรม :)</p>
     )}
   </Card>
     </div>

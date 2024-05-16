@@ -177,7 +177,7 @@ export default function Join() {
                     <FormItem>
                       <h1 className='font-semibold self-center'>กรอกรหัส 6 หลักเพื่อค้นหากิจกรรม</h1>
                       <FormControl>
-                        <InputOTP maxLength={6} pattern={REGEXP_ONLY_DIGITS_AND_CHARS} {...field}>
+                        <InputOTP maxLength={6} pattern={REGEXP_ONLY_DIGITS_AND_CHARS} {...field} inputMode='text'>
                           <InputOTPGroup>
                             <InputOTPSlot index={0} />
                             <InputOTPSlot index={1} />

@@ -1,5 +1,5 @@
 'use client'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { IoChevronForwardOutline, IoChevronBackOutline } from 'react-icons/io5'
 import * as React from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'

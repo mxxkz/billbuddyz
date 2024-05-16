@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import { Avatar } from '@/components/ui/avatar'
-import { createBillingNormal } from '../../../../../actions/billing'
+import { createBillingList, createBillingNormal, updateSlipToPaid } from '../../../../../actions/billing'
 import { toast } from '@/components/ui/use-toast'
 import {
   Dialog,
@@ -28,6 +28,7 @@ import { IoAddCircleSharp } from 'react-icons/io5'
 import { FaCircleMinus } from 'react-icons/fa6'
 import ParticipantCheckboxes from '@/components/ParticipantCheckboxes'
 import { useBillingStore } from '@/stores/billingStore'
+import { useEffect, useState } from 'react'
 
 
 export default function Step2() {
@@ -36,6 +37,7 @@ export default function Step2() {
   const billingType = searchParams.get('billingType')
   const {selectedParticipants, eventId} = useParticipantsStore()
   const {billing, hasReceipt, setHasReceipt, setBilling} = useBillingStore()
+  const [open, setOpen] = useState(false)
   const formNormal = useForm<createBillingNormalSchemaType>({
     resolver: zodResolver(createBillingNormalSchema),
     defaultValues: {
@@ -45,7 +47,11 @@ export default function Step2() {
   const formList = useForm<createBillingListSchemaType>({
     resolver: zodResolver(createBillingListSchema),
     defaultValues: {
-      totalAmount: 0
+      totalAmount: 0.00,
+      serviceCharge: 0.00,
+      vat: 0.00,
+      discount: 0.00,
+      itemList: []
     }
   })
   const {fields, append, remove} = useFieldArray<createBillingListSchemaType>({
@@ -53,7 +59,7 @@ export default function Step2() {
     name: 'itemList'
   })
 
-  if (hasReceipt) {
+  useEffect(() => {
     formList.reset({
       totalAmount: billing.total,
       vat: billing.vat,
@@ -64,21 +70,11 @@ export default function Step2() {
         price: itemm.price,
       }))
     });
-  }
-  // } else {
-  //   formList.reset({
-  //     totalAmount: 0,
-  //     vat: 0,
-  //     serviceCharge: 0,
-  //     discount: 0,
-  //   });
-  // }
-  const handleSaveComplete =  async (field: number, participantList: string[]) => {
-    console.log('step2',field)
+  }, [hasReceipt])
+
+  const handleSelectParticipant =  async (field: number, participantList: string[]) => {
     const transformedParticipantList = participantList.map(participant => ({ id: participant }))
-    console.log(transformedParticipantList)
     await formList.setValue(`itemList.${field}.participantList`, transformedParticipantList)
-    console.log('fieldsss', formList.watch())
   }
 
 
@@ -108,11 +104,47 @@ export default function Step2() {
   }
 
   async function onSubmitList(data: createBillingListSchemaType) {
-    await console.log('this is data', data)
+    try {
+      setOpen(false)
+      await createBillingList(eventId,data)
+      setHasReceipt(false)
+      setBilling({
+          item: [],
+          total: 0,
+          vat: 0,
+          serviceCharge: 0,
+          discount: 0,
+        }
+      )
+      formList.reset()
+      toast({
+        title: 'Success',
+        description: 'สร้างบิลเก็บเงินสำเร็จ',
+      })
+      setTimeout(() => {
+        router.replace('/dashboard')
+      }, 3000)
+    }catch (e:any) {
+      setOpen(false)
+      toast({
+        title: 'error',
+        description: 'ข้อมูลไม่ถูกต้อง ตรวจสอบข้อมูลอีกครั้ง',
+        variant: 'destructive'
+      })
+    }
   }
 
   function onBack() {
     setHasReceipt(false)
+    setBilling({
+        item: [],
+        total: 0,
+        vat: 0,
+        serviceCharge: 0,
+        discount: 0,
+    }
+    )
+    formList.reset()
     router.back()
   }
 
@@ -179,7 +211,7 @@ export default function Step2() {
                     <DialogHeader className='text-left'>
                       <DialogTitle>Are you sure?</DialogTitle>
                       <DialogDescription>
-                        เมื่อกดยืนยันจะไม่สามารถแก้ไขได้ ระบบจะลบกิจกรรมนี้ออกจากตารางของคุณ
+                        เมื่อกดยืนยันจะไม่สามารถแก้ไขได้ ระบบจะสร้างการเรียกเก็บเงินไปยังผู้เข้าร่วม
                       </DialogDescription>
                     </DialogHeader>
 
@@ -203,7 +235,7 @@ export default function Step2() {
           <>
           <Form {...formList}>
             <form className='space-y-4'>
-          <Card className='w-full sm:w-1/3 shadow-lg'>
+          <Card className='w-full shadow-lg'>
             <CardContent className='pt-4 flex flex-col gap-4'>
                   <div className='flex w-full justify-between items-center'>
                     <div className='text-xl font-semibold flex-1 basis-1/2'>จำนวนเงินทั้งหมด</div>
@@ -220,7 +252,7 @@ export default function Step2() {
                     />
                   </div>
                   {fields.map((item, index) => (
-                  <div key={index} className='flex w-full flex-col border bg-[#F5F5F8] p-2 gap-4'>
+                  <div key={item.id} className='flex w-full flex-col border bg-[#F5F5F8] p-2 gap-4'>
                     <div className='flex w-full justify-between items-center gap-2'>
                       <FaCircleMinus size={20} onClick={() => remove(index)} />
                       <FormField
@@ -249,28 +281,29 @@ export default function Step2() {
                       />
                     </div>
                     <div className='flex w-full justify-end items-center gap-2'>
-                      {/*<ParticipantCheckboxes field={`itemList.${index}.participantList`} onSelectParticipant={handleSaveComplete} />*/}
                       <FormField
                         control={formList.control}
                         name={`itemList.${index}.participantList`}
                         render={({field})=> (
+                          <div className='flex flex-col gap-2 items-end'>
                           <FormItem className='basis-1/3'>
                             <FormControl>
-                              <ParticipantCheckboxes field={index} onSelectParticipant={handleSaveComplete} />
+                              <ParticipantCheckboxes field={index} onSelectParticipant={handleSelectParticipant} />
                             </FormControl>
-                            <FormMessage />
                           </FormItem>
+                          <FormMessage />
+                          </div>
                         )}
                       />
                     </div>
                   </div> ))}
-                  <Button type='button' className='bg-[#F5F5F8] flex gap-2 justify-start' variant='outline' onClick={() => append({ name: '', price: 0, participantList: [] })}>
+                  <Button type='button' className='bg-[#F5F5F8] flex gap-2 justify-start' variant='outline' onClick={() => append({name: '', price: 0, participantList: [] })}>
                     <IoAddCircleSharp size={30} />
                     เพิ่มรายการ
                   </Button>
             </CardContent>
           </Card>
-          <Card className='w-full sm:w-1/3 shadow-lg'>
+          <Card className='w-full shadow-lg'>
             <CardContent className='flex flex-col gap-4 pt-6'>
               <div className='flex w-full justify-between items-center'>
                 <div className='text-lg font-semibold flex-1 basis-1/2'>Service Charge</div>
@@ -314,25 +347,22 @@ export default function Step2() {
                   )}
                 />
               </div>
-              <Dialog>
+              <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
                   <Button className='rounded-full w-full'>สร้างบิล</Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]" onInteractOutside={(e) => {
-                  e.preventDefault()
-                }}>
+                <DialogContent className="sm:max-w-[425px]">
                   <DialogHeader className='text-left'>
                     <DialogTitle>Are you sure?</DialogTitle>
                     <DialogDescription>
                       เมื่อกดยืนยันจะไม่สามารถแก้ไขบิลเรียกเก็บเงินนี้ได้
                     </DialogDescription>
                   </DialogHeader>
-
                   <DialogFooter>
                     <DialogClose asChild>
                       <div className='flex justify-end gap-2'>
-                        <Button className='rounded-full' type="submit" onClick={formList.handleSubmit(onSubmitList)} >บันทึก</Button>
-                        <Button className='rounded-full' type="button" variant='secondary'>
+                        <Button className='rounded-full' onClick={formList.handleSubmit(onSubmitList)}>บันทึก</Button>
+                        <Button className='rounded-full' variant='secondary'>
                           ยกเลิก
                         </Button>
                       </div>

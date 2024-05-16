@@ -19,7 +19,6 @@ import { Calendar } from '@/components/ui/calendar'
 import { Label } from '@/components/ui/label'
 import { TimePickerInput } from '@/components/TimePickerInput'
 import { Clock } from 'lucide-react'
-import { HiOutlineBell } from 'react-icons/hi2'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useForm } from 'react-hook-form'
 import { editEventSchema, editEventSchemaType } from '@/schema/eventSchema'
@@ -65,7 +64,6 @@ export default function Edit() {
       eventName: '',
       description: '',
       location: '',
-      notification: '0',
       organizerId: ''
     }
   })
@@ -76,13 +74,11 @@ export default function Edit() {
     const fetchData = async () => {
       const response = await getEventById(id)
       if(response !== null) {
-        console.log('this is event datail', response)
         form.setValue('id', response.id)
         form.setValue('eventName', response.name)
         form.setValue('date', response.date)
         form.setValue('description', response.description || '')
         form.setValue('location', response.location || '')
-        form.setValue('notification', response.notification as '0' | '10' | '30' | '60' | '1440')
         form.setValue('organizerId', response.organizer.id)
         setParticipant(response.eventParticipants)
       }
@@ -93,12 +89,12 @@ export default function Edit() {
   const handleMarkForDeletion = (index:any) => {
     setMarkedForDeletion([...markedForDeletion, participant[index]])
     setParticipant([...participant.slice(0, index), ...participant.slice(index + 1)])
-  };
+  }
 
   const handleUndoDeletion = (index:any) => {
     setParticipant([...participant, markedForDeletion[index]])
     setMarkedForDeletion([...markedForDeletion.slice(0, index), ...markedForDeletion.slice(index + 1)])
-  };
+  }
 
 
   const onSubmit = async (data: editEventSchemaType) => {
@@ -174,7 +170,7 @@ export default function Edit() {
                   name='date'
                   render={({ field }) => (
                     <FormItem className="flex flex-col w-full">
-                      <FormDescription>กิจกรรมของคุณจะเริ่มเมื่อไหร่?</FormDescription>
+                      <FormLabel>กิจกรรมของคุณจะเริ่มเมื่อไหร่?</FormLabel>
                       <Popover>
                         <FormControl>
                           <PopoverTrigger asChild>
@@ -254,32 +250,6 @@ export default function Edit() {
                 />
                 <FormField
                   control={form.control}
-                  name='notification'
-                  render={({field}) => (
-                    <FormItem className='flex flex-col w-full'>
-                      <FormLabel className='font-semibold'>การแจ้งเตือน</FormLabel>
-                      <FormControl>
-                        <div className='bg-[#F5F5F8] border border-[#CBD5E1] flex gap-1 items-center px-2 rounded-md focus-within:ring-2'>
-                          <HiOutlineBell size={30}/>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <SelectTrigger className='border-none bg-[#F5F5F8]'>
-                              <SelectValue placeholder='ไม่แจ้งเตือน' />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value='0' >ไม่แจ้งเตือน</SelectItem>
-                              <SelectItem value='10' >ก่อน 10 นาที</SelectItem>
-                              <SelectItem value='30' >ก่อน 30 นาที</SelectItem>
-                              <SelectItem value='60'>ก่อน 1 ชั่วโมง</SelectItem>
-                              <SelectItem value='1440'>ก่อน 1 วัน</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
                   name='organizerId'
                   render={({field}) => (
                     <FormItem className='flex flex-col w-full'>
@@ -287,9 +257,6 @@ export default function Edit() {
                       <FormControl>
                         <div className='bg-[#F5F5F8] border border-[#CBD5E1] flex gap-1 items-center px-2 rounded-md focus-within:ring-2'>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            {/*<SelectTrigger className='border-none bg-[#F5F5F8]'>*/}
-                            {/*  <SelectValue placeholder='Select an organizer'/>*/}
-                            {/*</SelectTrigger>*/}
                             <SelectTrigger className='border-none bg-[#F5F5F8]'>
                               {participant.find(user => user.user.id === field.value) ? (
                                 <div className='flex gap-2 items-center'>
@@ -347,7 +314,6 @@ export default function Edit() {
                       {user.user.id !== form.getValues().organizerId && (
                         <button
                           onClick={() => handleMarkForDeletion(index)}
-                          // className="p-1 rounded-full bg-red-500 text-white"
                           aria-label="Delete participant"
                         >
                           <FiMinusCircle size={25} />
@@ -377,7 +343,6 @@ export default function Edit() {
                   ))}
                   </div>
                 </div>
-                {/*<Button className='rounded-full mt-10 w-full' type="submit">สร้างกิจกรรม</Button>*/}
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button className='w-full rounded-full'>บันทึก</Button>
@@ -390,12 +355,10 @@ export default function Edit() {
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      {/*<div className='flex w-full gap-2'>*/}
                         <AlertDialogCancel className='rounded-full'>Cancel</AlertDialogCancel>
                         <AlertDialogAction className='rounded-full' onClick={()=>onSubmit(formData)}>
                           Confirm
                         </AlertDialogAction>
-                      {/*</div>*/}
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>

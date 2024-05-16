@@ -4,12 +4,10 @@ import { useParticipantsStore } from '@/stores/participantsStore'
 import {
   DropdownMenu, DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
 import { RiUserAddFill } from 'react-icons/ri'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect,useState } from 'react'
 import Image from 'next/image'
 import { Avatar } from '@/components/ui/avatar'
 
@@ -22,15 +20,10 @@ const ParticipantCheckboxes = ({field,onSelectParticipant}:selectParticipant) =>
   const { selectedParticipants } = useParticipantsStore()
   const [checkedParticipants, setCheckedParticipants] = useState<string[]>([])
   useEffect(() => {
-    onSelectParticipant(field, checkedParticipants);
+    onSelectParticipant(field, checkedParticipants)
   }, [checkedParticipants])
 
   const handleCheckedChange = (participantId: string, checked: boolean) => {
-    // if (checked) {
-    //   setCheckedParticipants(prevState => [...prevState, participantId]);
-    // } else {
-    //   setCheckedParticipants(prevState => prevState.filter(id => id !== participantId));
-    // }
     setCheckedParticipants(prevState => {
       if (checked) {
         return [...prevState, participantId];
@@ -40,14 +33,9 @@ const ParticipantCheckboxes = ({field,onSelectParticipant}:selectParticipant) =>
     })
   }
 
-  const onSet = () => {
-    onSelectParticipant(field, checkedParticipants)
-  }
-
   return(
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          {/*<Button variant="outline">Open</Button>*/}
           <div>
             <RiUserAddFill size={20} />
           </div>
@@ -71,11 +59,10 @@ const ParticipantCheckboxes = ({field,onSelectParticipant}:selectParticipant) =>
               </DropdownMenuCheckboxItem>
             </div>
           ))}
-            {/*<Button onClick={onSet}>click</Button>*/}
           </div>
         </DropdownMenuContent>
       </DropdownMenu>
   )
 }
 
-export default React.memo(ParticipantCheckboxes)
+export default ParticipantCheckboxes

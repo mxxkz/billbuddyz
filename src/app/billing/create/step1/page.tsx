@@ -5,13 +5,13 @@ import * as React from 'react'
 import { IoChevronBackOutline } from 'react-icons/io5'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { getParticipanFromEventId } from '../../../../../actions/user'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { participantsSchemaType, participantsSchema } from '@/schema/userSchema'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from '@/components/ui/use-toast'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -20,6 +20,8 @@ import { Avatar } from '@/components/ui/avatar'
 import { useParticipantsStore } from '@/stores/participantsStore'
 import { Input } from '@/components/ui/input'
 import { useBillingStore } from '@/stores/billingStore'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { HiOutlineLightBulb } from 'react-icons/hi'
 
 
 export default function Step1() {
@@ -36,6 +38,7 @@ export default function Step1() {
     }
   }
   )
+  const [inputKey, setInputKey] = useState(Date.now())
 
   useEffect(() => {
     if (!loading && !session?.user) {
@@ -46,13 +49,11 @@ export default function Step1() {
         const response = await getParticipanFromEventId(eventId!)
         if (response) {
           await setParticipants(response)
-          console.log('image url', response)
-          console.log('type', billingType)
         }
       }
       fetchParticipants()
     }
-    form.reset({ participants: selectedParticipants });
+    form.reset({ participants: selectedParticipants })
   }, [loading, session, selectedParticipants])
 
 
@@ -63,22 +64,29 @@ export default function Step1() {
     if (image) {
       const formData = new FormData();
       formData.append('file', image)
-      await console.log(image)
       const response = await fetch('https://wangaim-api-bill-buddyz.hf.space/uploadfile/', {
         method: 'POST',
         body: formData,
-      });
+      })
 
       if (response.ok) {
         const responseBody = await response.json(); // or response.text() if the response is plain text
-        console.log('Image uploaded successfully.', responseBody)
         await setBilling(responseBody)
         await setHasReceipt(true)
+        router.push(`/billing/create/step2?billingType=list`)
       } else {
-        console.error('Image upload failed.');
+        setImage(null)
+        setInputKey(Date.now())
+        await setIsLoading(false)
+        toast({
+          title: 'error',
+          description: 'รูปภาพใบเสร็จไม่ถูกต้อง กรุณาอัพโหลดรูปใหม่อีกครั้งหรือกรอกข้อมูลด้วยตนเอง',
+          variant: 'destructive'
+        })
       }
+    }else{
+      router.push(`/billing/create/step2?billingType=list`)
     }
-    router.push(`/billing/create/step2?billingType=list`)
   }
   async function onSubmitNormal(data: participantsSchemaType) {
     await setSelectedParticipants(data.participants)
@@ -97,7 +105,9 @@ export default function Step1() {
   const [image, setImage] = useState(null)
 
   const handleImageChange = (e: any) => {
-    setImage(e.target.files[0])
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0])
+    }
   }
 
   return (
@@ -180,7 +190,7 @@ export default function Step1() {
           <Card className='w-full sm:w-1/3 shadow-lg'>
             <CardHeader className='pb-2'>
               <div className='text-xl font-semibold'>
-                ใครต้องจ่ายเงินบ้างน้า
+                ใครต้องจ่ายเงินบ้าง
               </div>
             </CardHeader>
             <CardContent className='flex flex-col gap-4'>
@@ -247,7 +257,14 @@ export default function Step1() {
                 </div>
               </CardHeader>
             <CardContent className='flex flex-col gap-4'>
-              <Input type='file'  accept='image/*' onChange={handleImageChange} />
+              <Alert>
+                <HiOutlineLightBulb size={20}/>
+                <AlertTitle>Tips!</AlertTitle>
+                <AlertDescription>
+                    ถ่ายใบเสร็จให้เห็นตัวอักษรชัดเจน เพื่อเพิ่มประสิทธิภาพที่ดีขึ้น กดถัดไปหากต้องการเพิ่มรายการด้วยตนเอง
+                </AlertDescription>
+              </Alert>
+              <Input key={inputKey} type='file'  accept='image/*' onChange={handleImageChange} />
               <Button className='rounded-full w-full' onClick={form.handleSubmit(onSubmitList)}> {isLoading ? 'กำลังประมวลผล...' : 'ถัดไป'}</Button>
             </CardContent>
           </Card>

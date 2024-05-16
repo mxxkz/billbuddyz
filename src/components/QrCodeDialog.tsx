@@ -16,26 +16,13 @@ import Image from 'next/image'
 import { storage } from '../../firebaseConfig'
 import { getQrCode, updateQrCode } from '../../actions/user'
 import { ref, getDownloadURL, uploadBytes } from 'firebase/storage'
-import { toast } from '@/components/ui/use-toast'
 import * as React from 'react'
 
 
 
 export const QrCodeDialog = ({userId, qrCode, onSaveComplete}: {userId: string, qrCode:string | null, onSaveComplete: () => void}) => {
   const [image, setImage] = useState<string | null>(qrCode)
-  const [originalImage, setOriginalImage] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  // useEffect(() => {
-  //   const fetchImageUrl = async () => {
-  //     const response = await getQrCode(userId)
-  //     console.log('this is response dialog', response)
-  //     if(response) {
-  //       setOriginalImage(response.qrcode)
-  //       setImage(response.qrcode)
-  //     }
-  //   }
-  //   fetchImageUrl()
-  // }, [])
 
   const handleImageClick = () => {
       fileInputRef.current?.click()
@@ -49,20 +36,19 @@ export const QrCodeDialog = ({userId, qrCode, onSaveComplete}: {userId: string, 
         if (typeof reader.result === 'string') {
           setImage(reader.result)
         }
-      };
+      }
       reader.readAsDataURL(file)
     }
-  };
+  }
 
   const handleSave = async () => {
-    const file = fileInputRef.current?.files ? fileInputRef.current.files[0] : null;
+    const file = fileInputRef.current?.files ? fileInputRef.current.files[0] : null
     if (file) {
       const imageRef = ref(storage,`/images/qrcode/${userId}`)
       uploadBytes(imageRef,file).then(()=>
         {
           getDownloadURL(imageRef).then(
             (imageUrl: string) => {
-              // setOriginalImage(imageUrl)
               setImage(imageUrl)
               console.log(imageUrl)
               updateQrCode(userId,imageUrl)

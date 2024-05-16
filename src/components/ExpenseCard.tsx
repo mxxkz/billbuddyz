@@ -21,7 +21,7 @@ const ExpenseCard = ({ billing, type }: {billing:any, type:string}) => {
           {formattedMonth}
         </h1>
       </div>
-      <Separator orientation="vertical" className='bg-pink-400 h-24 w-1' />
+      <Separator orientation="vertical" className='bg-[#68D0DF] h-24 w-1' />
       <div className='flex flex-col gap-2 grow'>
         <div className='flex flex-col'>
         <p className='text-md font-bold'>{event.name}</p>
@@ -29,7 +29,7 @@ const ExpenseCard = ({ billing, type }: {billing:any, type:string}) => {
         </div>
         <div className={cn(type==='Payer'? 'justify-between': 'justify-end', 'flex pt-4')}>
           {type==='Payer' &&
-          <Badge className='bg-[#FFDF8B] px-1 font-medium text-neutral-800 rounded-md hover:bg-[#FFDF8B]]'>{billingParticipants[0].paymentStatus}</Badge>
+          <Badge className={cn(billingParticipants[0]?.paymentStatus==='verifying'? 'bg-[#FFDF8B]':'bg-[#F29E6E]', 'px-1 font-medium text-neutral-800 rounded-md ')}>{billingParticipants[0].paymentStatus}</Badge>
           }
           <p className='text-lg font-medium'><span className='text-lg font-medium'> {type==='Payer'? (billingParticipants[0].totalAmount.toFixed(2)): totalAmount.toFixed(2)} </span>บาท</p>
         </div>

@@ -15,7 +15,6 @@ export async function createEvent(form:createEventSchemaType) {
       location: form.location,
       date: form.date,
       description: form.description,
-      notification: form.notification,
       joinId: form.joinId,
       organizerId: form.organizerId,
       eventParticipants: {
@@ -59,7 +58,6 @@ export async function getAllEvent() {
               date: true,
               location: true,
               description: true,
-              notification: true,
               joinId: true,
               organizer: {
                 select: {
@@ -103,7 +101,6 @@ export async function getEventById(id:string){
       description: true,
       location: true,
       date: true,
-      notification: true,
       organizer: {
         select: {
           id: true,
@@ -148,7 +145,6 @@ export async function editEvent(form: editEventSchemaType) {
       description: form.description,
       date: form.date,
       location: form.location,
-      notification: form.notification,
       organizerId: form.organizerId,
     }
   })
@@ -165,7 +161,6 @@ export async function getEventByJoinId(joinId: string) {
       description: true,
       location: true,
       date: true,
-      notification: true,
       joinId: true,
       organizer: {
         select: {

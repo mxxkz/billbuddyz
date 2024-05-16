@@ -54,7 +54,6 @@ model Event {
   location          String?
   date              DateTime
   description       String?
-  notification      String
   joinId            String?             @map("join_id")
   organizer         User                @relation(fields: [organizerId], references: [id], onDelete: Cascade)
   organizerId       String              @map("organizer_id") @db.Uuid
@@ -81,6 +80,7 @@ model Billing {
   serviceCharge       Float?                @default(0) @map("service_charge")
   vat                 Float?                @default(0)
   discount            Float?                @default(0)
+  billingStatus       Boolean               @default(true) @map("billing_status")
   billingParticipants BillingParticipants[]
   items               Item[]
   event               Event                 @relation(fields: [eventId], references: [id], onDelete: Cascade)
@@ -92,6 +92,9 @@ model BillingParticipants {
   billingId     String        @map("billing_id") @db.Uuid
   userId        String        @map("user_id") @db.Uuid
   totalAmount   Float         @map("total_amount")
+  serviceCharge Float?        @default(0) @map("service_charge")
+  vat           Float?        @default(0)
+  discount      Float?        @default(0)
   paymentSlip   String?       @map("payment_slip")
   paymentStatus PaymentStatus @default(unpaid) @map("payment_status")
   billing       Billing       @relation(fields: [billingId], references: [id], onDelete: Cascade)

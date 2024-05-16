@@ -10,12 +10,12 @@ import {Card} from '@/components/ui/card'
 import ExpenseCard from '@/components/ExpenseCard'
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { redirect } from 'next/navigation'
+import { redirect, useRouter } from 'next/navigation'
 import { getBillingOwner, getBillingPayer } from '../../../actions/billing'
-import { getAllEvent } from '../../../actions/event'
 export default function Billing() {
   const {data: session, status} = useSession()
   const loading = status === 'loading'
+  const router = useRouter()
   const [dataPayer, setDataPayer] = useState<any>(null)
   const [dataOwner, setDataOwner] = useState<any>(null)
   const [totalPayer, setTotalPayer] = useState<number>(0)
@@ -26,17 +26,13 @@ export default function Billing() {
       return redirect('/')
     }
     if (session?.user) {
-      console.log(session.user)
       const fetchData = async () => {
         const response = await getBillingPayer(session?.user.id)
         const responseOwner = await getBillingOwner(session?.user.id)
-        // const response = await getAllEvent()
         if (response !== null) {
-          console.log(response)
           await setDataPayer(response)
         }
         if (responseOwner !== null) {
-          console.log(responseOwner)
           await setDataOwner(responseOwner)
         }
       }
@@ -63,10 +59,10 @@ export default function Billing() {
   return (
     <div className='min-h-screen min-w-full'>
       <div className='flex flex-col gap-10 items-center px-4 py-10'>
-        <h1 className='text-2xl font-bold'>
+        <h1 className='text-2xl font-medium'>
           Billing
         </h1>
-        <Tabs defaultValue='shared' className="w-full">
+        <Tabs defaultValue='shared' className="w-full sm:w-1/2">
           <TabsList className="grid w-full grid-cols-2 shadow-lg font-abc">
             <TabsTrigger value='shared' >เงินที่ต้องจ่าย</TabsTrigger>
             <TabsTrigger value='owner'>เงินที่ต้องได้คืน</TabsTrigger>
@@ -79,7 +75,9 @@ export default function Billing() {
                 บาท
               </h1>
               {dataPayer && dataPayer.map((billing:any) => (
-                <ExpenseCard key={billing.id} billing={billing} type='Payer'/>
+                  <div className='w-full' key={billing.id} onClick={()=>router.push(`/billing/${billing.id}?eventId=${billing.eventId}&type=payer`)}>
+                    <ExpenseCard billing={billing} type='Payer'/>
+                  </div>
               ))
               }
             </Card>
@@ -92,7 +90,9 @@ export default function Billing() {
                 THB
               </h1>
               {dataOwner && dataOwner.map((billing:any) => (
-                <ExpenseCard key={billing.id} billing={billing} type='Owner'/>
+                <div className='w-full' key={billing.id} onClick={()=>router.push(`/billing/${billing.id}?eventId=${billing.eventId}&type=owner`)}>
+                <ExpenseCard billing={billing} type='Owner'/>
+                </div>
               ))
               }
             </Card>

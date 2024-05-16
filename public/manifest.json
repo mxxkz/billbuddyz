@@ -5,22 +5,22 @@
   "description": "A web application for manage groupt event & expense",
   "icons": [
     {
-      "src": "logo.png",
+      "src": "logo72x72.png",
       "sizes": "72x72",
       "type": "image/png"
     },
     {
-      "src": "logo.png",
+      "src": "logo192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "logo.png",
+      "src": "logo384x384.png",
       "sizes": "384x384",
       "type": "image/png"
     },
     {
-      "src": "logo.png",
+      "src": "logo512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -29,7 +29,22 @@
   "theme_color": "#FFFFFF",
   "background_color": "#FFFFFF",
   "start_url": "/",
-  "scope": ".",
+  "scope": "/",
   "display": "standalone",
-  "orientation": "portrait"
+  "orientation": "any",
+  "screenshots": [
+    {
+      "src": "Screenshot.png",
+      "sizes": "668x1482",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "ScreenshotDesktop.png",
+      "sizes": "2994x1654",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
+
 }

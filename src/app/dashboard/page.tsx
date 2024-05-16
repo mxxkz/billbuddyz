@@ -15,8 +15,8 @@ export default async function Dashboard() {
 
   return (
     <div className='min-h-screen min-w-full'>
-      <div className='flex flex-col px-4 py-10 gap-4'>
-      <div className='flex gap-4 items-center self-start'>
+      <div className='flex flex-col px-4 py-10 gap-4 items-center'>
+      <div className='flex gap-4 items-center self-start sm:self-center sm:w-1/2'>
         <Avatar className='h-12 w-12'>
           {session.user.image? (
             <div className="relative h-full w-full aspect-square">

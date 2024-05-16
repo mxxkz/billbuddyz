@@ -1,7 +1,7 @@
 import withSerwistInit from '@serwist/next'
 
 const withSerwist = withSerwistInit({
-    cacheOnFrontEndNav: true,
+    // cacheOnFrontEndNav: true,
     swSrc: 'src/utils/sw.ts', // add the path where you create sw.ts
     swDest: 'public/sw.js',
     reloadOnOnline: true,

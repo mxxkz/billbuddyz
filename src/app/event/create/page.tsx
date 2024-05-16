@@ -16,10 +16,10 @@ import {
 } from '@/components/ui/popover'
 import {
   Form,
-  FormControl, FormDescription,
+  FormControl,
   FormField,
   FormItem,
-  FormLabel, FormMessage
+  FormLabel,
 } from '@/components/ui/form'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -33,8 +33,6 @@ import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { GoCalendar } from 'react-icons/go'
 import { Textarea } from '@/components/ui/textarea'
 import { HiOutlineLocationMarker } from 'react-icons/hi'
-import { HiOutlineBell } from 'react-icons/hi2'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { createEventSchema, createEventSchemaType } from '@/schema/eventSchema'
 import { getExistingJoinId, createEvent } from '../../../../actions/event'
 import { useSession } from 'next-auth/react'
@@ -53,7 +51,6 @@ export default function Create() {
       eventName: '',
       description: '',
       location: '',
-      notification: '0',
       joinId: null,
       organizerId: ''
     }
@@ -84,13 +81,11 @@ export default function Create() {
     try {
       if(type == 'group') {
         const joinId = await generateUniqueJoinId()
-        console.log('Generated joinId:', joinId)
         data.joinId = joinId
       }
       if(session) {
         data.organizerId = session?.user.id
       }
-      console.log('Generated data:', data)
       await createEvent(data)
       toast({
         title: 'Success',
@@ -159,7 +154,7 @@ export default function Create() {
                   name='date'
                   render={({ field }) => (
                     <FormItem className="flex flex-col w-full">
-                      <FormDescription>กิจกรรมของคุณจะเริ่มเมื่อไหร่?</FormDescription>
+                      <FormLabel>กิจกรรมของคุณจะเริ่มเมื่อไหร่?</FormLabel>
                       <Popover>
                         <FormControl>
                           <PopoverTrigger asChild>
@@ -167,14 +162,13 @@ export default function Create() {
                                 variant="outline"
                                 className={cn(
                                   "w-full justify-start text-left bg-[#F5F5F8] border border-[#CBD5E1] flex gap-4 items-center px-2 rounded-md focus-within:ring-2",
-                                  !field.value && "text-muted-foreground"
                                 )}
                               >
                                 <GoCalendar size={30} />
                                 {field.value ? (
                                   <span className='font-normal'>{format(field.value, "PP HH:mm")}</span>
                                 ) : (
-                                  <span className='font-normal'>วันที่เริ่มกิจกรรม</span>
+                                  <span className='font-normal text-muted-foreground'>วันที่เริ่มกิจกรรม</span>
                                 )}
                               </Button>
                           </PopoverTrigger>
@@ -232,32 +226,6 @@ export default function Create() {
                         <div className='bg-[#F5F5F8] border border-[#CBD5E1] flex gap-1 items-center px-2 rounded-md focus-within:ring-2'>
                           <HiOutlineLocationMarker size={30}/>
                           <Input className='border-none bg-[#F5F5F8]' placeholder='เพิ่มสถานที่' {...field} />
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='notification'
-                  render={({field}) => (
-                    <FormItem className='flex flex-col w-full'>
-                      <FormLabel className='font-semibold'>การแจ้งเตือน</FormLabel>
-                      <FormControl>
-                        <div className='bg-[#F5F5F8] border border-[#CBD5E1] flex gap-1 items-center px-2 rounded-md focus-within:ring-2'>
-                          <HiOutlineBell size={30}/>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <SelectTrigger className='border-none bg-[#F5F5F8]'>
-                                <SelectValue placeholder='ไม่แจ้งเตือน' />
-                              </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value='0' >ไม่แจ้งเตือน</SelectItem>
-                              <SelectItem value='10' >ก่อน 10 นาที</SelectItem>
-                              <SelectItem value='30' >ก่อน 30 นาที</SelectItem>
-                              <SelectItem value='60'>ก่อน 1 ชั่วโมง</SelectItem>
-                              <SelectItem value='1440'>ก่อน 1 วัน</SelectItem>
-                            </SelectContent>
-                          </Select>
                         </div>
                       </FormControl>
                     </FormItem>
