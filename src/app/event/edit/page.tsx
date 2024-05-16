@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import { deleteParticipants, getEventById, editEvent } from '../../../../actions/event'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import * as React from 'react'
 import { IoChevronBackOutline } from 'react-icons/io5'
 import { Card, CardContent } from '@/components/ui/card'
@@ -50,7 +50,7 @@ type Participant = {
   user: User
 };
 
-export default function Edit() {
+function Edit() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const id = searchParams.get('id') || ''
@@ -374,3 +374,10 @@ export default function Edit() {
   )
 }
 
+export default function EditWrapper() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Edit />
+    </Suspense>
+  )
+}

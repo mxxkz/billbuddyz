@@ -5,7 +5,7 @@ import * as React from 'react'
 import { IoChevronBackOutline } from 'react-icons/io5'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { getParticipanFromEventId } from '../../../../../actions/user'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { participantsSchemaType, participantsSchema } from '@/schema/userSchema'
 import { useForm } from 'react-hook-form'
@@ -24,7 +24,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { HiOutlineLightBulb } from 'react-icons/hi'
 
 
-export default function Step1() {
+function Step1() {
   const searchParams = useSearchParams()
   const billingType = searchParams.get('billingType')
   const router = useRouter()
@@ -273,5 +273,12 @@ export default function Step1() {
       </div>
       <Navbar initialButton='billing' />
     </div>
+  )
+}
+export default function Step1Wrapper() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Step1 />
+    </Suspense>
   )
 }

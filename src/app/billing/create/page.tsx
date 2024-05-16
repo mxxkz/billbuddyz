@@ -6,10 +6,11 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import Navbar from '@/components/Navbar'
 import Image from 'next/image'
 import { useParticipantsStore } from '@/stores/participantsStore'
+import { Suspense } from 'react'
 
 
 
-export default function CreatBilling() {
+function CreatBilling() {
   const router = useRouter()
   const {setEventId} = useParticipantsStore()
   function onBack() {
@@ -71,5 +72,13 @@ export default function CreatBilling() {
     </div>
       <Navbar initialButton='billing' />
     </div>
+  )
+}
+
+export default function CreateBillingWrapper() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CreatBilling />
+    </Suspense>
   )
 }

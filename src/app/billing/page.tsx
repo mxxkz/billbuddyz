@@ -8,11 +8,12 @@ import {
 } from '@/components/ui/tabs'
 import {Card} from '@/components/ui/card'
 import ExpenseCard from '@/components/ExpenseCard'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { redirect, useRouter } from 'next/navigation'
 import { getBillingOwner, getBillingPayer } from '../../../actions/billing'
-export default function Billing() {
+import * as React from 'react'
+function Billing() {
   const {data: session, status} = useSession()
   const loading = status === 'loading'
   const router = useRouter()
@@ -101,5 +102,13 @@ export default function Billing() {
       </div>
       <Navbar initialButton='billing' />
     </div>
+  )
+}
+
+export default function BillingWrapper() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Billing />
+    </Suspense>
   )
 }

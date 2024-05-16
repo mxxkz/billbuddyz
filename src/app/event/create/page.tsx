@@ -36,9 +36,10 @@ import { HiOutlineLocationMarker } from 'react-icons/hi'
 import { createEventSchema, createEventSchemaType } from '@/schema/eventSchema'
 import { getExistingJoinId, createEvent } from '../../../../actions/event'
 import { useSession } from 'next-auth/react'
+import { Suspense } from 'react'
 
 
-export default function Create() {
+function Create() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const type = searchParams.get('type')
@@ -241,5 +242,13 @@ export default function Create() {
       </div>
       <Navbar initialButton='dashboard' />
     </div>
+  )
+}
+
+export default function CreateWrapper() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Create />
+    </Suspense>
   )
 }
