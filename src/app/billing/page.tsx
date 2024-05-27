@@ -13,6 +13,7 @@ import { useSession } from 'next-auth/react'
 import { redirect, useRouter } from 'next/navigation'
 import { getBillingOwner, getBillingPayer } from '../../../actions/billing'
 import * as React from 'react'
+import { Skeleton } from '@/components/ui/skeleton'
 function Billing() {
   const {data: session, status} = useSession()
   const loading = status === 'loading'
@@ -21,6 +22,7 @@ function Billing() {
   const [dataOwner, setDataOwner] = useState<any>(null)
   const [totalPayer, setTotalPayer] = useState<number>(0)
   const [totalOwner, setTotalOwner] = useState<number>(0)
+  const [loadingData, setLoadingData] = useState(true)
 
   useEffect(() => {
     if (!loading && !session?.user) {
@@ -32,9 +34,11 @@ function Billing() {
         const responseOwner = await getBillingOwner(session?.user.id)
         if (response !== null) {
           await setDataPayer(response)
+          await setLoadingData(false)
         }
         if (responseOwner !== null) {
           await setDataOwner(responseOwner)
+          await setLoadingData(false)
         }
       }
       fetchData()
@@ -70,6 +74,16 @@ function Billing() {
           </TabsList>
           <TabsContent value='shared'>
             <Card className='min-h-[42rem] flex flex-col gap-6 items-center p-4'>
+              {loadingData? (
+                  <>
+                    <Skeleton className="h-4 w-full " />
+                    <Skeleton className="h-32 w-full " />
+                    <Skeleton className="h-32 w-full " />
+                    <Skeleton className="h-32 w-full " />
+                  </>
+                ):
+                (
+              <>
               <h1  className='text-xl font-medium'>
                 จำนวนเงินทั้งหมด:
                 <span className='text-2xl font-medium'>{totalPayer}</span>
@@ -81,6 +95,7 @@ function Billing() {
                   </div>
               ))
               }
+              </>)}
             </Card>
           </TabsContent>
           <TabsContent value='owner'>

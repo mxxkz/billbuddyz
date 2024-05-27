@@ -75,7 +75,7 @@ export default function Profile() {
             <div className='flex flex-col gap-4 w-full items-center'>
               <QrCodeDialog userId={session! && session.user.id} qrCode={image} onSaveComplete={handleSaveComplete}/>
               { image?
-                (<div className='relative w-full h-full aspect-square shadow-lg rounded-2xl border'>
+                (<div className='relative w-full h-full aspect-[3/4] shadow-lg rounded-2xl border'>
                   <Image src={image} alt='logo' fill />
                 </div>) :
                 (

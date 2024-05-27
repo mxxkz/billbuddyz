@@ -35,6 +35,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
+import Navbar from '@/components/Navbar'
 
 
 export default function Page(){
@@ -243,7 +244,7 @@ export default function Page(){
                   <Skeleton className="h-[250px] w-full rounded-xl bg-white" />
                 ):(
                   <>
-              <div className='relative w-full h-full aspect-square shadow-lg rounded-2xl border flex items-center justify-center'>
+              <div className='relative w-full h-full aspect-[3/4] shadow-lg rounded-2xl border flex items-center justify-center'>
                 {event.organizer.qrcode?
                   (<Image src={event.organizer.qrcode} alt='logo' fill />):(
                     <div>ไม่มี QR Code</div>
@@ -412,7 +413,7 @@ export default function Page(){
                           <>
                           {participant.paymentStatus=='paid'? (
                             <div className='flex flex-col gap-4'>
-                            <div className='relative w-full h-full aspect-square shadow-lg rounded-2xl border flex justify-center items-center'>
+                            <div className='relative w-full h-full aspect-[3/4] shadow-lg rounded-2xl border flex justify-center items-center'>
                               {participant.paymentSlip? (
                                   <Image src={participant.paymentSlip} alt='slip' fill />
                               ) : (
@@ -423,7 +424,7 @@ export default function Page(){
                             <Button className='rounded-full' disabled >จ่ายแล้ว</Button>
                             </div>
                             ):(
-                          <div className='relative w-full h-full aspect-square shadow-lg rounded-2xl border flex justify-center items-center'>
+                          <div className='relative w-full h-full aspect-[3/4] shadow-lg rounded-2xl border flex justify-center items-center'>
                             ยังไม่จ่าย
                           </div>)}
                             </>
@@ -440,6 +441,7 @@ export default function Page(){
         )
         }
       </div>
+      <Navbar initialButton='billing' />
     </div>
   )
 }

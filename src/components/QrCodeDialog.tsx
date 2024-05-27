@@ -80,11 +80,10 @@ export const QrCodeDialog = ({userId, qrCode, onSaveComplete}: {userId: string, 
         </DialogHeader>
         <Input type="file" accept="image/*" onChange={handleImageUpload} ref={fileInputRef} style={{ display: 'none' }} />
         {image ? (
-          <div className='relative w-full h-full aspect-square shadow-lg rounded-2xl border' onClick={handleImageClick}>
+          <div className='relative w-full h-full aspect-[3/4] shadow-lg rounded-2xl border' onClick={handleImageClick}>
             <Image fill src={image} alt={"profile image"} referrerPolicy={"no-referrer"} priority/>
           </div>
         ) : (
-          // <Button onClick={handleImageClick}>Add Image</Button>
           <div className='rounded-2xl w-full h-full aspect-square flex justify-center items-center border' onClick={handleImageClick}>
             <span className='text-muted-foreground'>เพิ่มรูปภาพ QR Code</span>
           </div>
